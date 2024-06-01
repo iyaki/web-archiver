@@ -44,7 +44,6 @@ func parseSitemap(data []byte) (*URLSet, error) {
 }
 
 func saveToWebArchive(urlToSave string) error {
-	// Define the URL and the data to be sent
 	apiURL := "https://web.archive.org/save/"
 	data := url.Values{}
 	data.Set("url", urlToSave) // Replace with actual relative path
@@ -52,18 +51,15 @@ func saveToWebArchive(urlToSave string) error {
 	data.Set("capture_outlinks", "on")
 	data.Set("capture_screenshot", "on")
 
-	// Create a new request using http
 	req, err := http.NewRequest("POST", apiURL, bytes.NewBufferString(data.Encode()))
 	if err != nil {
 		return err
 	}
 
-	// Set the necessary headers
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("LOW %s:%s", os.Getenv("WAYBACK_S3_ACCESS_KEY"), os.Getenv("WAYBACK_S3_SECRET_KEY")))
 
-	// Send the request using http.Client
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -71,7 +67,6 @@ func saveToWebArchive(urlToSave string) error {
 	}
 	defer resp.Body.Close()
 
-	// Print the response status
 	bodyResponse, _ := io.ReadAll(resp.Body)
 	fmt.Println("Web Archive Response Status: ", resp.Status)
 	fmt.Println("Web Archive Response: ", string(bodyResponse))
@@ -79,6 +74,7 @@ func saveToWebArchive(urlToSave string) error {
 	return nil
 }
 
+// TODO: End proccess with exist status > 0 on errors
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Println("A sitemap URL as first argument is required")
@@ -104,6 +100,7 @@ func main() {
 		return
 	}
 
+	// TODO: Add concurrency
 	for _, url := range urlset.URLs {
 		fmt.Println(url)
 		if url.Lastmod == "" || (date != "" && date <= url.Lastmod) {
