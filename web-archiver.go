@@ -76,11 +76,14 @@ func saveToWebArchive(urlToSave string) error {
 	return nil
 }
 
-// TODO: End proccess with exist status > 0 on errors
+func exitWithError(message string) {
+	fmt.Println(message)
+	os.Exit(1)
+}
+
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("A sitemap URL as first argument is required")
-		return
+		exitWithError("A sitemap URL as first argument is required")
 	}
 
 	date := ""
@@ -92,14 +95,12 @@ func main() {
 
 	data, err := fetchSitemap(url)
 	if err != nil {
-		fmt.Printf("Error fetching sitemap: %v\n", err)
-		return
+		exitWithError(fmt.Sprintf("Error fetching sitemap: %v", err))
 	}
 
 	urlset, err := parseSitemap(data)
 	if err != nil {
-		fmt.Printf("Error parsing sitemap: %v\n", err)
-		return
+		exitWithError(fmt.Sprintf("Error parsing sitemap: %v", err))
 	}
 
 	var wg sync.WaitGroup
@@ -112,8 +113,8 @@ func main() {
 		wg.Add(1)
 		go func(url URL) {
 			defer wg.Done()
-			fmt.Println(url)
 			
+			// TODO: Add archive.today saving
 			saveToWebArchive(url.Loc)
 
 		}(url)
