@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"sync"
 )
 
 type URL struct {
@@ -46,7 +47,7 @@ func parseSitemap(data []byte) (*URLSet, error) {
 func saveToWebArchive(urlToSave string) error {
 	apiURL := "https://web.archive.org/save/"
 	data := url.Values{}
-	data.Set("url", urlToSave) // Replace with actual relative path
+	data.Set("url", urlToSave)
 	data.Set("capture_all", "on")
 	data.Set("capture_outlinks", "on")
 	data.Set("capture_screenshot", "on")
@@ -68,6 +69,7 @@ func saveToWebArchive(urlToSave string) error {
 	defer resp.Body.Close()
 
 	bodyResponse, _ := io.ReadAll(resp.Body)
+	fmt.Println(urlToSave)
 	fmt.Println("Web Archive Response Status: ", resp.Status)
 	fmt.Println("Web Archive Response: ", string(bodyResponse))
 
@@ -100,13 +102,22 @@ func main() {
 		return
 	}
 
-	// TODO: Add concurrency
+	var wg sync.WaitGroup
 	for _, url := range urlset.URLs {
 		fmt.Println(url)
-		if url.Lastmod == "" || (date != "" && date <= url.Lastmod) {
-			saveToWebArchive(url.Loc)
-		} else {
+		if url.Lastmod != "" && (date == "" || date > url.Lastmod) {
 			fmt.Printf("Skipping %q\n", url.Loc)
+			continue
 		}
+		wg.Add(1)
+		go func(url URL) {
+			defer wg.Done()
+			fmt.Println(url)
+			
+			saveToWebArchive(url.Loc)
+
+		}(url)
 	}
+	wg.Wait()
+
 }
