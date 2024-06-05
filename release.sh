@@ -1,4 +1,8 @@
-#!/bin/env sh
+#!/bin/env bash
 
-git tag -a "${1:?version as first argument is required}" -m "" &&
+echo "Last version: $(git tag -l | head -1)"
+
+read -rp "Enter new version: " version
+
+git tag -a "${version}" -m "" &&
 git push --tags
