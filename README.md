@@ -1,35 +1,58 @@
 # web-archiver
 
-Utility to save on the [Web Archive](https://archive.org/) pages from a [sitemap](https://www.sitemaps.org/)
+A command-line utility to save web pages from a [sitemap](https://www.sitemaps.org/) to the [Web Archive](https://archive.org/) (archive.org).
+
+## Features
+
+- Parse standard XML sitemaps
+- Save pages to Web Archive with full captures (screenshots, outlinks)
+- Filter pages by last modification date
+- Concurrent processing for faster archiving
+
+## Installation
+
+### From Source
+
+Requires Go 1.22 or later:
+
+```bash
+go install github.com/iyaki/web-archiver/v2@latest
+```
+
+### From Releases
+
+Download pre-built binaries from the [Releases page](https://github.com/iyaki/web-archiver/releases).
+
+## Configuration
+
+This program requires Web Archive API credentials as environment variables:
+
+- `WAYBACK_S3_ACCESS_KEY` - Your Web Archive S3 access key
+- `WAYBACK_S3_SECRET_KEY` - Your Web Archive S3 secret key
+
+Get your API keys from [Web Archive S3-Like API](https://archive.org/account/s3.php).
 
 ## Usage
 
-```shell
-web-archiver <sitemap URI> [<date>]
+```bash
+web-archiver <sitemap_url> [<date>]
 ```
 
-This programs needs 2 environment variables:
+### Arguments
 
-- WAYBACK_S3_ACCESS_KEY
-- WAYBACK_S3_SECRET_KEY
-
-Keys are obtained from [Web Archive S3-Like API](https://archive.org/account/s3.php)
-
-The program will save all the entries present in the sitemap with a
-`lastMod` property newer than the provided date.
-
-If no date is provided all entries will be saved
+- `sitemap_url` (required): URL to the sitemap XML file
+- `date` (optional): Filter date in ISO format (YYYY-MM-DD). Only URLs with `lastMod` newer than this date will be saved.
 
 ### Examples
 
-```shell
-# Save only URLs with `lastMod` newer than 2024-05-01
-web-archiver https://example.com/sitemap.xml 2024-05-01
+Save all URLs from a sitemap:
+
+```bash
+web-archiver https://example.com/sitemap.xml
 ```
 
-Only URLs modified since 2024-05-01 will be saved
+Save only URLs modified since a specific date:
 
-```shell
-# Save all the URLs present in the sitemap
-web-archiver https://example.com/sitemap.xml
+```bash
+web-archiver https://example.com/sitemap.xml 2024-05-01
 ```
