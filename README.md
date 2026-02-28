@@ -48,11 +48,11 @@ web-archiver <sitemap_url> [<date>]
 Save all URLs from a sitemap:
 
 ```bash
-web-archiver https://example.com/sitemap.xml
+web-archiver https://iyaki.ar/sitemap.xml
 ```
 
 Save only URLs modified since a specific date:
 
 ```bash
-web-archiver https://example.com/sitemap.xml 2024-05-01
+web-archiver https://iyaki.ar/sitemap.xml 2024-05-01
 ```
